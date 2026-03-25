@@ -10,14 +10,15 @@ import { AddnewTaskForm } from "./form";
 
 export default function Dashboard() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [boardId, setBoardId] = useState<number | null>(null); // tobe move to redux
 
   return (
     <Styled.Main>
-      <Sidebar />
+      <Sidebar setBoardId={setBoardId} />
 
       <Styled.RightSide>
         <Topbar setIsOpen={setIsOpen} />
-        <Content />
+        <Content boardId={boardId} />
       </Styled.RightSide>
 
       {isOpen && (

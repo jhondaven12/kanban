@@ -1,20 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { Checkbox } from "@/app/UI/checkbox";
 import * as Styled from "./tasksForm.styled";
 import { Select } from "@/app/UI/select";
+import {
+  StatuslistsProps,
+  SubtaskListsType,
+  TaskListsType,
+} from "../interface";
 
-interface StatuslistsProps {
-  statusId: number;
-  statusName: string;
-}
-interface SubTasks {
-  subTaskId: number;
-  subTaskName: string;
-  subTaskStatus: boolean;
-}
+type TasksFormProps = {
+  tasks: TaskListsType;
+};
 
-export function TasksForm() {
+export function TasksForm({ tasks }: TasksFormProps) {
   const [statusLists, setStatusLists] = useState<StatuslistsProps[]>([
     {
       statusId: 1,
@@ -31,37 +30,26 @@ export function TasksForm() {
   ]);
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
   const [showActionBtn, setShowActionBtn] = useState<boolean>(false);
-  const [subTasks, setSubTasks] = useState<SubTasks[]>([
-    {
-      subTaskId: 1,
-      subTaskName: "Task one",
-      subTaskStatus: true,
-    },
-    {
-      subTaskId: 2,
-      subTaskName: "Task two",
-      subTaskStatus: false,
-    },
-  ]);
+  const [subTasksLists, setSubTasksLists] = useState<SubtaskListsType[]>([]);
 
-  const onCheckHandler = (value: string): void => {
-    const updateStatus = subTasks.map((subtask) => {
-      if (subtask.subTaskId === Number(value)) {
-        return { ...subtask, subTaskStatus: !subtask.subTaskStatus };
-      }
-      return subtask;
-    });
+  useEffect(() => {
+    setSubTasksLists(tasks?.subTasks ? [tasks?.subTasks] : []);
+  }, [tasks]);
+  // const onCheckHandler = (value: string): void => {
+  //   const updateStatus = subTasks.map((subtask) => {
+  //     if (subtask.subTaskId === Number(value)) {
+  //       return { ...subtask, subTaskStatus: !subtask.subTaskStatus };
+  //     }
+  //     return subtask;
+  //   });
 
-    setSubTasks(updateStatus);
-  };
+  //   setSubTasks(updateStatus);
+  // };
 
   return (
     <Styled.TaskContent>
       <Styled.TaskHeader>
-        <h3>
-          Research pricing points of various competitors and trial different
-          business models
-        </h3>
+        <h3>{tasks?.taskTitle}</h3>
         <Styled.TaskHeaderDots>
           <HiOutlineDotsVertical
             onClick={() => setShowActionBtn((prev) => !prev)}
@@ -77,17 +65,13 @@ export function TasksForm() {
       </Styled.TaskHeader>
 
       <Styled.TaskDescriptions>
-        <p>
-          We know what we`re plannng to build for version one. Now we need to
-          finalise the first pricing model we`ll use. Keep iterating the
-          subtasks until we have a conherent proposition.
-        </p>
+        <p>{tasks?.taskSubtitle}</p>
       </Styled.TaskDescriptions>
 
       <Styled.TasksSubTasks>
-        <h4>Subtasks {`(2 of 3)`}</h4>
+        <h4>Subtasks {`(2 of ${subTasksLists.length})`}</h4>
 
-        <Styled.SubtasksList>
+        {/* <Styled.SubtasksList>
           {subTasks.length > 0 ? (
             subTasks.map((subtask) => (
               <div key={subtask.subTaskId}>
@@ -102,7 +86,7 @@ export function TasksForm() {
           ) : (
             <Styled.NoSubtasks>No Subtasks Created</Styled.NoSubtasks>
           )}
-        </Styled.SubtasksList>
+        </Styled.SubtasksList> */}
       </Styled.TasksSubTasks>
 
       <Select

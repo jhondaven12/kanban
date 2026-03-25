@@ -1,4 +1,4 @@
 export interface BoardListsType {
-  id: number;
+  boardId: number;
   boardName: string;
 }

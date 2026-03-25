@@ -1,19 +1,41 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Styled from "./sidebar.styled";
 import { BsColumns } from "react-icons/bs";
 import { BoardListsType } from "./interface";
 import { Modal } from "@/app/UI/modal";
 import { AddNewBoard } from "./Addnewboard/addNewBoard";
+import { getBoardAPI } from "@/app/api/board-api";
 
-export default function Sidebar() {
+type Props = {
+  setBoardId: React.Dispatch<React.SetStateAction<number | null>>;
+};
+
+export default function Sidebar({ setBoardId }: Props) {
   const [activeBoard, setActiveBoard] = useState<number>(1);
   const [isOpen, setIsOpen] = useState(false);
-  const [boards, setBoard] = useState<BoardListsType[]>([
-    { id: 1, boardName: "Board One" },
-    { id: 2, boardName: "Board Two" },
-    { id: 3, boardName: "Board Three" },
-  ]);
+  const [boards, setBoards] = useState<BoardListsType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getBoardAPI();
+        setBoards(response.data);
+
+        const firstBoard = response?.data[0]?.boardId ?? null;
+        setActiveBoard(firstBoard);
+        setBoardId(firstBoard);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleOnClick = (boardId: number) => {
+    setActiveBoard(boardId);
+    setBoardId(boardId);
+  };
 
   const BoardLists = () => {
     return (
@@ -21,11 +43,11 @@ export default function Sidebar() {
         {boards.length > 0
           ? boards.map((item) => (
               <Styled.List
-                key={item.id}
-                $boardId={item.id}
+                key={item.boardId}
+                $boardId={item.boardId}
                 $activeBoard={activeBoard}
               >
-                <Styled.Listlabel onClick={() => setActiveBoard(item.id)}>
+                <Styled.Listlabel onClick={() => handleOnClick(item.boardId)}>
                   <BsColumns style={{ margin: "4px" }} />
                   {item.boardName}
                 </Styled.Listlabel>
