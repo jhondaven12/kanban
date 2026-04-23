@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { ColumnTasks } from "../content.styled";
-import { TaskListsType } from "../interface";
+import { TaskListsType } from "../content.type";
 import { Modal } from "@/app/UI/modal";
 import { TasksForm } from "./tasksForm";
 
@@ -15,12 +15,16 @@ export function TaskContainer({ tasks }: TaskContainerProps) {
     <Fragment>
       <ColumnTasks onClick={() => setOpenModal(true)}>
         <h3>{tasks.taskTitle}</h3>
-        <p>{tasks.taskSubtitle}</p>
+        <p>{tasks.taskDescription}</p>
       </ColumnTasks>
 
       {openModal && (
         <Modal width="550px" onClose={() => setOpenModal(false)}>
-          <TasksForm tasks={tasks} />
+          <TasksForm
+            title={tasks.taskTitle}
+            description={tasks.taskDescription}
+            subTasks={tasks.subTasks}
+          />
         </Modal>
       )}
     </Fragment>

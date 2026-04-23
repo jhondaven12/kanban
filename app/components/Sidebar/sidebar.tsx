@@ -2,42 +2,60 @@
 import { useEffect, useState } from "react";
 import * as Styled from "./sidebar.styled";
 import { BsColumns } from "react-icons/bs";
-import { BoardListsType } from "./interface";
 import { Modal } from "@/app/UI/modal";
 import { AddNewBoard } from "./Addnewboard/addNewBoard";
 import { getBoardAPI } from "@/app/api/board-api";
+import { useAppDispatch, useAppSelector } from "@/app/redux/slice/hook";
+import { setBoardName } from "@/app/redux/slice/boardSlice";
+import { BoardType } from "@/app/types";
 
-type Props = {
-  setBoardId: React.Dispatch<React.SetStateAction<number | null>>;
-};
-
-export default function Sidebar({ setBoardId }: Props) {
+export default function Sidebar() {
+  const dispatch = useAppDispatch();
   const [activeBoard, setActiveBoard] = useState<number>(1);
-  const [isOpen, setIsOpen] = useState(false);
-  const [boards, setBoards] = useState<BoardListsType[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [boards, setBoards] = useState<BoardType[]>([]);
+
+  const currentBoard = useAppSelector((state) => state.boardSlice);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getBoardAPI();
-        setBoards(response.data);
-
         const firstBoard = response?.data[0]?.boardId ?? null;
+
+        dispatch(
+          setBoardName({
+            boardId: response?.data[0]?.boardId ?? null,
+            boardName: response?.data[0]?.boardName ?? "",
+          }),
+        );
+        setBoards(response.data);
         setActiveBoard(firstBoard);
-        setBoardId(firstBoard);
       } catch (err) {
         console.error(err);
       }
     };
     fetchData();
-  }, []);
+  }, [currentBoard.boardLoad]);
 
-  const handleOnClick = (boardId: number) => {
+  const handleOnClick = ({ boardId, boardName }: BoardType) => {
+    dispatch(
+      setBoardName({
+        boardId,
+        boardName,
+      }),
+    );
     setActiveBoard(boardId);
-    setBoardId(boardId);
   };
 
   const BoardLists = () => {
+    if (boards.length === 0)
+      return (
+        <ul style={{ textAlign: "center", padding: "10px" }}>
+          No board exists
+        </ul>
+      );
+
     return (
       <ul>
         {boards.length > 0
@@ -47,7 +65,7 @@ export default function Sidebar({ setBoardId }: Props) {
                 $boardId={item.boardId}
                 $activeBoard={activeBoard}
               >
-                <Styled.Listlabel onClick={() => handleOnClick(item.boardId)}>
+                <Styled.Listlabel onClick={() => handleOnClick(item)}>
                   <BsColumns style={{ margin: "4px" }} />
                   {item.boardName}
                 </Styled.Listlabel>
@@ -65,7 +83,7 @@ export default function Sidebar({ setBoardId }: Props) {
       </h2>
 
       <Styled.ListContainer>
-        <p>All BOARDS (3)</p>
+        <p>All BOARDS {`(${boards.length})`}</p>
         <BoardLists />
 
         <Styled.AddboardBtn onClick={() => setIsOpen(true)}>
@@ -80,7 +98,7 @@ export default function Sidebar({ setBoardId }: Props) {
           width="550px"
           onClose={() => setIsOpen(false)}
         >
-          <AddNewBoard />
+          <AddNewBoard setIsOpen={setIsOpen} />
         </Modal>
       )}
     </Styled.LeftSide>
