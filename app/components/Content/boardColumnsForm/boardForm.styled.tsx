@@ -12,6 +12,31 @@ export const BoardFormBody = styled.div`
   }
 `;
 
+export const BoardFormLists = styled.div`
+  max-height: 230px;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 20px;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+`;
+
 export const FormInputs = styled.div`
   display: flex;
   gap: 10px;

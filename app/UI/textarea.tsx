@@ -2,6 +2,7 @@ import { TextareaContainer } from "./textarea.styled";
 
 interface Textareaprops {
   label: string;
+  value: string;
   placeholder: string;
   propertyKey: string;
   onChange: (value: string, fieldName: string) => void;
@@ -10,6 +11,7 @@ interface Textareaprops {
 
 export const Textarea = ({
   label,
+  value,
   placeholder,
   propertyKey,
   onChange,
@@ -22,6 +24,7 @@ export const Textarea = ({
         onChange={(e) => onChange(e.target.value, propertyKey)}
         placeholder={placeholder}
         disabled={disabled}
+        value={value}
       />
     </TextareaContainer>
   );

@@ -6,9 +6,15 @@ type axiosType = {
   headers: RawAxiosRequestHeaders;
 };
 
+type BoardType = {
+  boardId: number;
+  boardName: string;
+};
+
 type ColumnName = {
   columnName: string;
 };
+
 export type InsertBoard = {
   boardName: string;
   columns: ColumnName[];
@@ -20,12 +26,23 @@ export type InsertColumnType = {
   columnName: string;
 };
 
-type SubtasksType = {
+export type SubtasksType = {
+  taskId?: number;
+  subTaskStatus?: boolean;
+  subTaskId?: number;
   subTask: string;
 };
 
 export type InsertTaskType = {
+  boardId: number | null;
   columnId: number | null;
+  taskTitle: string;
+  taskDescription: string;
+  subTasks: SubtasksType[];
+};
+
+export type ModifyTaskType = {
+  taskId: number;
   taskTitle: string;
   taskDescription: string;
   subTasks: SubtasksType[];

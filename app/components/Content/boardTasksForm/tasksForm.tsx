@@ -1,34 +1,95 @@
-import { useEffect, useState } from "react";
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+  Dispatch,
+} from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { Checkbox } from "@/app/UI/checkbox";
 import * as Styled from "./tasksForm.styled";
 import { Select } from "@/app/UI/select";
 import { SubtaskListsType } from "../content.type";
-import { useAppSelector } from "@/app/redux/slice/hook";
+import { useAppDispatch } from "@/app/redux/slice/hook";
 import { ColumnListsType } from "@/app/types";
+import {
+  setBoardLoad,
+  setEditTasks,
+  setTasksInfo,
+} from "@/app/redux/slice/boardSlice";
+import { Button } from "@/app/UI/button";
+import { getSubTasksAPI, modifySubTasksAPI } from "@/app/api/board-api";
+import { SkeletonLoading } from "@/app/UI/skeletonLoading/skeletonOne";
 
 type TasksFormProps = {
+  columnId: number;
+  columnLists: ColumnListsType[];
+  taskId: number;
   title: string;
   description: string;
   subTasks: SubtaskListsType[];
+  setOpenModal: Dispatch<SetStateAction<boolean>>;
 };
 
-export function TasksForm({ title, description, subTasks }: TasksFormProps) {
+export function TasksForm({
+  columnId,
+  columnLists,
+  taskId,
+  title,
+  description,
+  subTasks,
+  setOpenModal,
+}: TasksFormProps) {
+  const dispatch = useAppDispatch();
   const [statusLists, setStatusLists] = useState<ColumnListsType[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
   const [showActionBtn, setShowActionBtn] = useState<boolean>(false);
   const [subTasksLists, setSubTasksLists] = useState<SubtaskListsType[]>([]);
+  const [storedSubTaskLists, setStoredSubTaskLists] = useState<
+    SubtaskListsType[]
+  >([]);
+  const [updatedItems, setUpdatedItems] = useState<SubtaskListsType[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const currentBoard = useAppSelector((state) => state.boardSlice);
+  const getSubTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await getSubTasksAPI(taskId);
+      setSubTasksLists(response.data);
+      setStoredSubTaskLists(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setStatusLists(currentBoard.boardColumn || []);
-  }, [currentBoard]);
+    getSubTasks();
+  }, [taskId]);
 
   useEffect(() => {
-    setSubTasksLists(subTasks);
-  }, [subTasks]);
+    setSelectedStatus(columnId);
+    setStatusLists(columnLists || []);
+  }, [columnId]);
 
+  useEffect(() => {
+    const changeItems = subTasksLists.filter((item) => {
+      const originalItem = storedSubTaskLists.find(
+        (o) => o.subTaskId === item.subTaskId,
+      );
+
+      if (!originalItem) return true;
+
+      return (
+        Boolean(item.subTaskStatus) !== Boolean(originalItem.subTaskStatus)
+      );
+    });
+
+    setUpdatedItems(changeItems);
+  }, [subTasksLists]);
+
+  // UPDATE SUBTASKS STATUS
   const onCheckHandler = (value: string): void => {
     const updateStatus = subTasksLists.map((subtask) => {
       if (subtask.subTaskId === Number(value)) {
@@ -36,13 +97,44 @@ export function TasksForm({ title, description, subTasks }: TasksFormProps) {
       }
       return subtask;
     });
-
     setSubTasksLists(updateStatus);
   };
 
   const onSelectHandler = (selectedOpt: SelectedStatus): void => {
     setSelectedStatus(selectedOpt.value);
   };
+
+  // ON EDIT TASKS
+  const onEdiTasks = useCallback(() => {
+    setOpenModal(false);
+    dispatch(setEditTasks(true));
+    dispatch(
+      setTasksInfo({
+        taskId,
+        title,
+        description,
+        subTasks: subTasks,
+      }),
+    );
+  }, []);
+
+  const onSaveTasks = async () => {
+    try {
+      if (updatedItems.length === 0) return;
+      setLoading(true);
+      const cleanedArray = updatedItems.map(({ taskId, ...rest }) => rest);
+      await modifySubTasksAPI(cleanedArray);
+      await getSubTasks();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // if (loading) {
+  //   return <SkeletonLoading />;
+  // }
 
   return (
     <Styled.TaskContent>
@@ -55,7 +147,7 @@ export function TasksForm({ title, description, subTasks }: TasksFormProps) {
 
           {showActionBtn && (
             <div>
-              <button>Edit Task</button>
+              <button onClick={onEdiTasks}>Edit Task</button>
               <button>Delete Task</button>
             </div>
           )}
@@ -94,6 +186,12 @@ export function TasksForm({ title, description, subTasks }: TasksFormProps) {
         onSelect={onSelectHandler}
         getLabel={(status) => status.columnName}
         getValue={(status) => Number(status.columnId)}
+      />
+
+      <Button
+        label="Save"
+        onClick={onSaveTasks}
+        disabled={updatedItems.length === 0}
       />
     </Styled.TaskContent>
   );

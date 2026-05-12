@@ -17,25 +17,44 @@ export default function Sidebar() {
 
   const currentBoard = useAppSelector((state) => state.boardSlice);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getBoardAPI();
-        const firstBoard = response?.data[0]?.boardId ?? null;
+  const fetchData = async () => {
+    try {
+      const response = await getBoardAPI();
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
 
-        dispatch(
-          setBoardName({
-            boardId: response?.data[0]?.boardId ?? null,
-            boardName: response?.data[0]?.boardName ?? "",
-          }),
-        );
-        setBoards(response.data);
-        setActiveBoard(firstBoard);
-      } catch (err) {
-        console.error(err);
-      }
+  useEffect(() => {
+    const initBoards = async (): Promise<void> => {
+      const response = await fetchData();
+      if (!response) return;
+
+      const firstBoard = response[0]?.boardId ?? null;
+
+      dispatch(
+        setBoardName({
+          boardId: response[0]?.boardId ?? null,
+          boardName: response[0]?.boardName ?? "",
+        }),
+      );
+      setBoards(response);
+      setActiveBoard(firstBoard);
     };
-    fetchData();
+    initBoards();
+  }, []);
+
+  useEffect(() => {
+    const refreshBoards = async (): Promise<void> => {
+      const response = await fetchData();
+      if (!response) return;
+
+      setBoards(response);
+    };
+
+    refreshBoards();
   }, [currentBoard.boardLoad]);
 
   const handleOnClick = ({ boardId, boardName }: BoardType) => {

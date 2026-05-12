@@ -1,5 +1,12 @@
 import axios from "axios";
-import { InsertBoard, InsertColumnType, InsertTaskType } from "./api.types";
+import {
+  InsertBoard,
+  InsertColumnType,
+  InsertTaskType,
+  ModifyTaskType,
+  SubtasksType,
+} from "./api.types";
+import { BoardType } from "../types";
 
 const api = axios.create({
   baseURL: "http://localhost:4000/api",
@@ -16,8 +23,16 @@ export const getBoardAPI = async () => {
 
 export const insertBoardAPI = async (data: InsertBoard) => {
   return await api({
-    url: "/addBoards",
+    url: "/insertBoard",
     method: "POST",
+    data,
+  });
+};
+
+export const modifyBoardAPI = async (data: BoardType) => {
+  return await api({
+    url: "/modifyBoard",
+    method: "PUT",
     data,
   });
 };
@@ -45,17 +60,56 @@ export const removeColumnAPI = async (data: number[]) => {
   });
 };
 
-export const getTasksAPI = async () => {
+export const getTasksAPI = async (boardId: number) => {
   return await api({
-    url: `/tasks`,
+    url: `/tasks/${boardId}`,
     method: "GET",
   });
 };
 
 export const insertTasksAPI = async (data: InsertTaskType) => {
   return await api({
-    url: `/tasks`,
+    url: `/insertTasks`,
     method: "POST",
+    data,
+  });
+};
+
+export const modifyTasksAPI = async (data: ModifyTaskType) => {
+  return await api({
+    url: `/modifyTasks`,
+    method: "PUT",
+    data,
+  });
+};
+
+export const getSubTasksAPI = async (id: number) => {
+  return await api({
+    url: `/getSubTasks/${id}`,
+    method: "GET",
+  });
+};
+
+export const inertSubTasksAPI = async (data: SubtasksType[]) => {
+  return await api({
+    url: `insertSubTasks`,
+    method: "POST",
+    data,
+  });
+};
+
+export const modifySubTasksAPI = async (data: SubtasksType[]) => {
+  return await api({
+    url: `/modifySubTasks`,
+    method: "PUT",
+    data,
+  });
+};
+
+export const removeSubTasksAPI = async (data: number[]) => {
+  return await api({
+    url: `removeSubTasks`,
+    method: "DELETE",
     data,
   });
 };

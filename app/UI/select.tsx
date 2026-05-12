@@ -11,6 +11,7 @@ interface SelectProps<T> {
   getLabel: (option: T) => string;
   getValue: (option: T) => number;
   onSelect: (selected: SelectOptionsProps) => void;
+  disabled?: boolean;
 }
 
 interface SelectOptionsProps {
@@ -25,6 +26,7 @@ export const Select = <T,>({
   getLabel,
   getValue,
   onSelect,
+  disabled,
 }: SelectProps<T>) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -42,13 +44,13 @@ export const Select = <T,>({
   useEffect(() => {
     const getSelectedOpt = selectOptions.find((item) => item.value === value);
     setInputValue(getSelectedOpt?.label ?? "");
-  }, [value]);
+  }, [value, selectOptions]);
 
   const FilterOptiopns = useMemo(() => {
     return selectOptions.filter(({ label }) =>
       label.toLowerCase().includes(inputValue?.toLowerCase() ?? ""),
     );
-  }, [selectOptions, inputValue, getLabel]);
+  }, [selectOptions, inputValue]);
 
   useOutsideAlterter({
     ref: wrapperRef,
@@ -69,12 +71,13 @@ export const Select = <T,>({
   return (
     <Styled.SelectContainer>
       <Styled.SelectTitle>{title}</Styled.SelectTitle>
-      <Styled.InputContainer ref={wrapperRef}>
+      <Styled.InputContainer ref={wrapperRef} $disabled={disabled}>
         <input
           type="text"
           value={inputValue}
           placeholder="Select Status..."
           onChange={(event) => onChangeHandler(event.target.value)}
+          disabled={disabled}
         />
 
         {isOpen && (

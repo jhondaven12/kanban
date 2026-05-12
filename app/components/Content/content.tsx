@@ -17,18 +17,16 @@ export default function Content() {
 
   const currentBoard = useAppSelector((state) => state.boardSlice);
 
-  console.log("currentBoard", currentBoard);
-
   useEffect(() => {
     const { boardId } = currentBoard;
 
     if (!boardId) return;
 
-    const fetchDta = async () => {
+    const fetchData = async () => {
       try {
         const [columnListRes, taskListsRes] = await Promise.all([
           getColumnAPI(boardId),
-          getTasksAPI(),
+          getTasksAPI(boardId),
         ]);
 
         dispatch(setBoardColumn(columnListRes.data));
@@ -39,14 +37,12 @@ export default function Content() {
       }
     };
 
-    fetchDta();
+    fetchData();
   }, [currentBoard.boardId, currentBoard.boardLoad]);
 
   const totalTasks = (columnId: number) => {
     return taskLists.filter((subItem) => subItem.columnId === columnId).length;
   };
-
-  console.log("taskLists", taskLists);
 
   return (
     <Styled.Content>

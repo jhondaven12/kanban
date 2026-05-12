@@ -7,7 +7,11 @@ export const SelectContainer = styled.div`
 
 export const SelectTitle = styled.div``;
 
-export const InputContainer = styled.div`
+interface InputContainerProps {
+  $disabled?: boolean;
+}
+
+export const InputContainer = styled.div<InputContainerProps>`
   position: relative;
   border-radius: 10px;
 
@@ -17,7 +21,7 @@ export const InputContainer = styled.div`
     background: none;
     border-radius: 5px;
     border: 1px solid gray;
-    color: white;
+    color: ${({ $disabled }) => ($disabled ? "gray" : "white")};
     margin-top: 5px;
     font-size: 16px;
 
