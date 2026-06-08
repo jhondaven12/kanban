@@ -7,13 +7,12 @@ import { ColumnListsType } from "@/app/types";
 import { useAppSelector, useAppDispatch } from "@/app/redux/slice/hook";
 import { verifyChangesById } from "@/app/utils/global.utils";
 import {
-  getColumnAPI,
   insertColumnAPI,
   modifyBoardAPI,
   removeColumnAPI,
 } from "@/app/api/board-api";
 import { v4 as uuidv4 } from "uuid";
-import { setBoardLoad, setEditTasks } from "@/app/redux/slice/boardSlice";
+import { setBoardLoad, setColumnModal } from "@/app/redux/slice/boardSlice";
 
 interface BoardFormProps {
   setOpenColumnForm: Dispatch<SetStateAction<boolean>>;
@@ -35,7 +34,6 @@ export function BoardForm({ setOpenColumnForm }: BoardFormProps) {
     setBoardName(currentBoard.boardName);
     setStoredBoardName(currentBoard.boardName);
     setBoardColumns(currentBoard.boardColumn);
-    console.log("currentBoard.boardColumn", currentBoard.boardColumn);
     setStoredBoardColumns(currentBoard.boardColumn);
   }, [currentBoard.boardColumn]);
 
@@ -121,12 +119,12 @@ export function BoardForm({ setOpenColumnForm }: BoardFormProps) {
         const columnIds = removedColumns.map((c) => c.columnId);
         await removeColumnAPI(columnIds as number[]);
       }
-
-      setOpenColumnForm(false);
     } catch (error) {
       console.error(error);
     } finally {
+      dispatch(setColumnModal(false));
       dispatch(setBoardLoad(false));
+      setOpenColumnForm(false);
     }
   };
 

@@ -7,7 +7,7 @@ import { TaskListsType } from "./content.type";
 import { ColumnListsType } from "@/app/types";
 import { TaskContainer } from "./boardTasksForm/tasksContainer";
 import { useAppDispatch, useAppSelector } from "@/app/redux/slice/hook";
-import { setBoardColumn } from "@/app/redux/slice/boardSlice";
+import { setBoardColumn, setColumnModal } from "@/app/redux/slice/boardSlice";
 
 export default function Content() {
   const dispatch = useAppDispatch();
@@ -68,11 +68,14 @@ export default function Content() {
         </Styled.NewColumns>
       )}
 
-      {openColumnForm && (
+      {(openColumnForm || currentBoard.columnModal) && (
         <Modal
           title="Edit Board"
           width="550px"
-          onClose={() => setOpenColumnForm(false)}
+          onClose={() => {
+            setOpenColumnForm(false);
+            dispatch(setColumnModal(false));
+          }}
         >
           <BoardForm setOpenColumnForm={setOpenColumnForm} />
         </Modal>

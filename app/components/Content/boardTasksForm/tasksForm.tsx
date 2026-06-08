@@ -18,8 +18,12 @@ import {
   setTasksInfo,
 } from "@/app/redux/slice/boardSlice";
 import { Button } from "@/app/UI/button";
-import { getSubTasksAPI, modifySubTasksAPI } from "@/app/api/board-api";
-import { SkeletonLoading } from "@/app/UI/skeletonLoading/skeletonOne";
+import {
+  getSubTasksAPI,
+  modifySubTasksAPI,
+  modifyTaskColumnAPI,
+  removeTaskAPI,
+} from "@/app/api/board-api";
 
 type TasksFormProps = {
   columnId: number;
@@ -49,18 +53,14 @@ export function TasksForm({
     SubtaskListsType[]
   >([]);
   const [updatedItems, setUpdatedItems] = useState<SubtaskListsType[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const getSubTasks = async () => {
     try {
-      setLoading(true);
       const response = await getSubTasksAPI(taskId);
       setSubTasksLists(response.data);
       setStoredSubTaskLists(response.data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -118,23 +118,47 @@ export function TasksForm({
     );
   }, []);
 
-  const onSaveTasks = async () => {
+  const disabledBtn =
+    Number(selectedStatus) === Number(columnId) && updatedItems.length === 0;
+
+  const onSaveTasks = async (): Promise<void> => {
     try {
-      if (updatedItems.length === 0) return;
-      setLoading(true);
-      const cleanedArray = updatedItems.map(({ taskId, ...rest }) => rest);
-      await modifySubTasksAPI(cleanedArray);
+      if (disabledBtn) return;
+
+      dispatch(setBoardLoad(true));
+
+      if (updatedItems.length > 0) {
+        const cleanedArray = updatedItems.map(({ taskId, ...rest }) => rest);
+        await modifySubTasksAPI(cleanedArray);
+      }
+
+      if (Number(selectedStatus) !== Number(columnId)) {
+        await modifyTaskColumnAPI({
+          taskId: taskId,
+          columnId: Number(selectedStatus),
+        });
+      }
+
       await getSubTasks();
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      dispatch(setBoardLoad(false));
     }
   };
 
-  // if (loading) {
-  //   return <SkeletonLoading />;
-  // }
+  const onDeleteTask = async (): Promise<void> => {
+    if (!taskId) return;
+
+    try {
+      dispatch(setBoardLoad(true));
+      await removeTaskAPI(taskId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dispatch(setBoardLoad(false));
+    }
+  };
 
   return (
     <Styled.TaskContent>
@@ -148,7 +172,7 @@ export function TasksForm({
           {showActionBtn && (
             <div>
               <button onClick={onEdiTasks}>Edit Task</button>
-              <button>Delete Task</button>
+              <button onClick={onDeleteTask}>Delete Task</button>
             </div>
           )}
         </Styled.TaskHeaderDots>
@@ -188,11 +212,7 @@ export function TasksForm({
         getValue={(status) => Number(status.columnId)}
       />
 
-      <Button
-        label="Save"
-        onClick={onSaveTasks}
-        disabled={updatedItems.length === 0}
-      />
+      <Button label="Save" onClick={onSaveTasks} disabled={disabledBtn} />
     </Styled.TaskContent>
   );
 }

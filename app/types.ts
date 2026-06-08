@@ -18,6 +18,7 @@ export type BoardStateType = {
   boardName: string;
   boardColumn: ColumnListsType[];
   boardLoad: boolean;
+  columnModal: boolean;
   editTasks: boolean;
   tasksInfo: TaskInfoType | null;
   taskColumnId: number | null;

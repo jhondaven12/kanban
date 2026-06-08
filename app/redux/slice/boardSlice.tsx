@@ -12,6 +12,7 @@ const initialState: BoardStateType = {
   boardName: "",
   boardColumn: [],
   boardLoad: false,
+  columnModal: false,
   editTasks: false,
   tasksInfo: null,
   taskColumnId: null,
@@ -33,6 +34,9 @@ export const boardReducer = createSlice({
     setBoardLoad: (state, action: PayloadAction<boolean>) => {
       state.boardLoad = action.payload;
     },
+    setColumnModal: (state, action: PayloadAction<boolean>) => {
+      state.columnModal = action.payload;
+    },
     setEditTasks: (state, action: PayloadAction<boolean>) => {
       state.editTasks = action.payload;
     },
@@ -49,6 +53,7 @@ export const {
   setBoardName,
   setBoardColumn,
   setBoardLoad,
+  setColumnModal,
   setEditTasks,
   setTasksInfo,
   setTaskColumnId,
@@ -61,6 +66,7 @@ export const selectBoardData = createSelector([selectBoardSlice], (board) => ({
   boardName: board.boardName,
   boardColumn: board.boardColumn,
   boardLoad: board.boardLoad,
+  columnModal: board.columnModal,
   editTasks: board.editTasks,
   tasksInfo: board.tasksInfo,
   taskColumnId: board.taskColumnId,

@@ -2,31 +2,40 @@ import styled from "styled-components";
 
 export const LeftSide = styled.div`
   width: 15%;
-  padding: 10px;
   border-right: 1px solid var(--defaultfont);
+`;
 
-  h2 {
-    text-align: center;
-    margin-top: 15px;
-  }
+export const BoardName = styled.h2`
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: normal;
+  color: white;
+  border-bottom: 1px solid gray;
+  height: 70px;
 
   b {
+    margin-left: 10px;
     color: var(--colorTomato);
   }
 `;
 
 export const ListContainer = styled.div`
-  margin-top: 40px;
-
-  p {
-    font-size: 12px;
-    margin-left: 15px;
-  }
+  padding: 15px;
 
   ul {
     list-style: none;
     padding: 0;
     margin: 15px auto 0;
+  }
+`;
+
+export const BoardQuantity = styled.div`
+  p {
+    font-size: 12px;
+    letter-spacing: 1.2px;
+    color: darkgray;
   }
 `;
 
@@ -37,7 +46,6 @@ interface ListsPorps {
 
 export const List = styled.li<ListsPorps>`
   position: relative;
-  padding: 10px;
   font-weight: 800;
   margin-bottom: 10px;
   cursor: pointer;
@@ -48,7 +56,7 @@ export const List = styled.li<ListsPorps>`
     top: 0;
     left: -10px;
     width: ${({ $boardId, $activeBoard }) =>
-      $boardId === $activeBoard ? "100%" : "0%"};
+      $boardId === $activeBoard ? "2%" : "0%"};
     height: 100%;
     background-color: var(--colorTomato);
     border-top-right-radius: 50px;
@@ -59,28 +67,37 @@ export const List = styled.li<ListsPorps>`
 
   &:hover {
     &::after {
-      width: 100%;
+      width: "2%";
     }
   }
 `;
 
 export const Listlabel = styled.div`
-  position: relative;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 5px 0;
+
+  p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
 `;
 
 export const AddboardBtn = styled.button`
   all: unset;
   position: relative;
   display: flex;
+  gap: 4px;
   align-items: center;
-  margin-top: 20px;
-  margin-left: 10px;
   color: tomato;
+  padding: 5px 0;
 
   p {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: normal;
   }

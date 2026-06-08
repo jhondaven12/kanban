@@ -3,6 +3,7 @@ import {
   InsertBoard,
   InsertColumnType,
   InsertTaskType,
+  ModifyTaskColumnType,
   ModifyTaskType,
   SubtasksType,
 } from "./api.types";
@@ -26,6 +27,13 @@ export const insertBoardAPI = async (data: InsertBoard) => {
     url: "/insertBoard",
     method: "POST",
     data,
+  });
+};
+
+export const removeBoardAPI = async (params: number) => {
+  return await api({
+    url: `/removeBoard/${params}`,
+    method: "delete",
   });
 };
 
@@ -78,6 +86,21 @@ export const insertTasksAPI = async (data: InsertTaskType) => {
 export const modifyTasksAPI = async (data: ModifyTaskType) => {
   return await api({
     url: `/modifyTasks`,
+    method: "PUT",
+    data,
+  });
+};
+
+export const removeTaskAPI = async (params: number) => {
+  return await api({
+    url: `removeTasks/${params}`,
+    method: "delete",
+  });
+};
+
+export const modifyTaskColumnAPI = async (data: ModifyTaskColumnType) => {
+  return await api({
+    url: `/modifyTaskColumn`,
     method: "PUT",
     data,
   });

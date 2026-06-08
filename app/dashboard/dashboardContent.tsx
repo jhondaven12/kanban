@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as Styled from "./dashboard.styled";
-import Content from "../components/Content/content";
+import Content from "../components/Content/page";
 import Sidebar from "../components/Sidebar/sidebar";
 import Topbar from "../components/Topbar/topbar";
 import { Modal } from "../UI/modal";
@@ -22,8 +22,6 @@ export function DashboardContent() {
     setIsOpen(!!currentBoard.editTasks);
   }, [currentBoard?.editTasks]);
 
-  console.log("currentBoard.editTasks", currentBoard.editTasks);
-
   // CLOSE MODAL
   const onCloseModal = () => {
     setIsOpen(false);
@@ -39,6 +37,7 @@ export function DashboardContent() {
     <Styled.Main>
       <Styled.Main>
         <Sidebar />
+
         <Styled.RightSide>
           <Topbar setIsOpen={setIsOpen} />
           <Content />

@@ -8,13 +8,13 @@ import { getBoardAPI } from "@/app/api/board-api";
 import { useAppDispatch, useAppSelector } from "@/app/redux/slice/hook";
 import { setBoardName } from "@/app/redux/slice/boardSlice";
 import { BoardType } from "@/app/types";
+import { LiaCloneSolid } from "react-icons/lia";
 
 export default function Sidebar() {
   const dispatch = useAppDispatch();
   const [activeBoard, setActiveBoard] = useState<number>(1);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [boards, setBoards] = useState<BoardType[]>([]);
-
   const currentBoard = useAppSelector((state) => state.boardSlice);
 
   const fetchData = async () => {
@@ -49,11 +49,40 @@ export default function Sidebar() {
   useEffect(() => {
     const refreshBoards = async (): Promise<void> => {
       const response = await fetchData();
+
+      const getUpdateBoard = response.find(
+        (b: BoardType) => b.boardId === currentBoard.boardId,
+      );
+
       if (!response) return;
+
+      // IF BOARD UPDATE
+      if (getUpdateBoard) {
+        dispatch(
+          setBoardName({
+            boardId: getUpdateBoard.boardId,
+            boardName: getUpdateBoard.boardName,
+          }),
+        );
+        setActiveBoard(getUpdateBoard.boardId);
+      }
+
+      // IF BOARD NOT EXIST
+      if (!getUpdateBoard) {
+        const firstBoard = response[0]?.boardId ?? null;
+
+        dispatch(
+          setBoardName({
+            boardId: response[0]?.boardId ?? null,
+            boardName: response[0]?.boardName ?? "",
+          }),
+        );
+
+        setActiveBoard(firstBoard);
+      }
 
       setBoards(response);
     };
-
     refreshBoards();
   }, [currentBoard.boardLoad]);
 
@@ -85,8 +114,8 @@ export default function Sidebar() {
                 $activeBoard={activeBoard}
               >
                 <Styled.Listlabel onClick={() => handleOnClick(item)}>
-                  <BsColumns style={{ margin: "4px" }} />
-                  {item.boardName}
+                  <BsColumns />
+                  <p>{item.boardName}</p>
                 </Styled.Listlabel>
               </Styled.List>
             ))
@@ -97,16 +126,19 @@ export default function Sidebar() {
 
   return (
     <Styled.LeftSide>
-      <h2>
+      <Styled.BoardName>
         DEV <b>{"< / >"}</b>
-      </h2>
+      </Styled.BoardName>
 
       <Styled.ListContainer>
-        <p>All BOARDS {`(${boards.length})`}</p>
+        <Styled.BoardQuantity>
+          <p>All BOARDS {`(${boards.length})`}</p>
+        </Styled.BoardQuantity>
+
         <BoardLists />
 
         <Styled.AddboardBtn onClick={() => setIsOpen(true)}>
-          <BsColumns style={{ margin: "4px" }} />
+          <BsColumns />
           <p>+ Create New Board</p>
         </Styled.AddboardBtn>
       </Styled.ListContainer>

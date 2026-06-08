@@ -47,3 +47,8 @@ export type ModifyTaskType = {
   taskDescription: string;
   subTasks: SubtasksType[];
 };
+
+export type ModifyTaskColumnType = {
+  taskId: number;
+  columnId: number;
+};
